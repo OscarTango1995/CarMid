@@ -28,6 +28,8 @@ void initAltitude() {
 }
 
 Altitude getAltitude(){
+    bmp.takeForcedMeasurement(); // Force the sensor to take a measurement
+
     float temperature = bmp.readTemperature();
     float pressure = bmp.readPressure() / 100.0F;  // Convert Pa to hPa
     float altitude = bmp.readAltitude(SEALEVELPRESSURE_HPA);
