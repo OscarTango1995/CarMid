@@ -2,6 +2,7 @@
 #include <U8g2lib.h>
 #include <Adafruit_I2CDevice.h>
 #include"temperature.h"
+#include"altitude.h"
 
 
 // U8G2 constructor for the OLED (replace 0x3C with the correct address if needed)
@@ -59,8 +60,9 @@ void drawMenu() {
     const char* menuItems[] = {
         "1. GPS",
         "2. Temperatures",
-        "3. Average",
-        "4. Service"
+        "3. Altitude",
+        "4. Average",
+        "5. Service"
     };
 
     int itemCount = sizeof(menuItems) / sizeof(menuItems[0]);
@@ -130,5 +132,17 @@ void drawTemperaturesScreen(Temperatures temp) {
     
     // Call drawDisplay to show the temperatures
     drawDisplay(oled2, "TEMPERATURES", content);
+        
+}
+
+// Function to display altitude data on the OLED
+void drawAltitudeScreen(Altitude altitude,Temperatures temp) {
+    // Create content string for display without floating points
+    char content[60]; // Ensure the buffer is large enough for your content
+    snprintf(content, sizeof(content), "ALT : %d M \nHPA : %d\nIAT : %d C \nOAT : %d C", 
+             (int)altitude.altitude, (int)altitude.pressure, (int)altitude.temperature,(int)temp.oat);
+    
+    // Call drawDisplay to show the temperatures
+    drawDisplay(oled2, "ALTITUDE", content);
         
 }

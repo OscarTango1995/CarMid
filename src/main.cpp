@@ -2,8 +2,9 @@
 #include"temperature.h"
 #include"display.h"
 #include"logger.h"
+#include"altitude.h"
 
-unsigned long previousTempMillis = 0; // Stores last time readings were updated
+unsigned long previousMillis = 0; // Stores last time readings were updated
 const long tempInterval = 30000; // Interval for displaying temperature readings
 const long tempSelection = 10000; // Interval for displaying temperature
 int currentMenu = 0; // Hard-coded to select "Temperatures" as default
@@ -19,17 +20,18 @@ void setup() {
 
 // initialize Sensors & Displays
   initDisplays();
-  initTempSensors();  
+  initTempSensors(); 
+  initAltitude(); 
   // initLogging();
-  
+
   delay(1000);
 }
 
 void loop() {
    unsigned long currentMillis = millis(); // Get the current time
 
-    if(currentMillis - previousTempMillis >= tempSelection) {
-        currentMenu=2;
+    if(currentMillis - previousMillis >= tempSelection) {
+        currentMenu=3;
     }
 
     switch (currentMenu)
@@ -49,11 +51,31 @@ void loop() {
             drawTemperaturesScreen(temp);
             isStarted=false;
             }
-            else if(currentMillis - previousTempMillis >= tempInterval) {
-                previousTempMillis = currentMillis;
+            else if(currentMillis - previousMillis >= tempInterval) {
+                previousMillis = currentMillis;
                 Temperatures temp = getTemperatures(); // Read temperature data
                 drawTemperaturesScreen(temp);// Update OLED with new readings
             }
+        break;
+        case 3:
+        if (isStarted){
+                Altitude altitude = getAltitude(); 
+                Temperatures temp = getTemperatures();
+                drawAltitudeScreen(altitude,temp);
+                isStarted=false;
+            }
+            else if(currentMillis - previousMillis >= tempInterval) {
+                previousMillis = currentMillis;
+                 Altitude altitude = getAltitude(); 
+                Temperatures temp = getTemperatures();
+                drawAltitudeScreen(altitude,temp);
+            }
+        break;
+        case 4:
+        /* code */
+        break;
+        case 5:
+        /* code */
         break;
 
     default:
