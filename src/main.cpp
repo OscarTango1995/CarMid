@@ -3,6 +3,7 @@
 #include"display.h"
 #include"logger.h"
 #include"altitude.h"
+#include"buzzer.h"
 
 unsigned long previousMillis = 0; // Stores last time readings were updated
 const long tempInterval = 30000; // Interval for displaying temperature readings
@@ -21,17 +22,19 @@ void setup() {
 // initialize Sensors & Displays
   initDisplays();
   initTempSensors(); 
-  initAltitude(); 
-  // initLogging();
-
-  delay(1000);
+//   initAltitude(); 
+//initLogging();
+    initBuzzer();
+    turnBuzzerOn(true);
+ 
+    delay(1000);
 }
 
 void loop() {
    unsigned long currentMillis = millis(); // Get the current time
 
     if(currentMillis - previousMillis >= tempSelection) {
-        currentMenu=3;
+        currentMenu=2;
     }
 
     switch (currentMenu)

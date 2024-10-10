@@ -2,6 +2,7 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #include"temperature.h"
+#include"buzzer.h"
 
 
 DHT dht(15, DHT21); // GPIO pin,Sensor Type
@@ -44,6 +45,10 @@ Temperatures getTemperatures(){
 
     float engineTemp = readEngineTemperature();
     delay(750);
+
+    if (engineTemp>=105.0){
+        turnBuzzerOn(false);
+    }
 
     Temperatures temp;
     temp.humidity=insideTemp.humidity + insideHumidityCalibration;
