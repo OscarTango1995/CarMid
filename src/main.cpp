@@ -5,10 +5,12 @@
 #include"altitude.h"
 #include"buzzer.h"
 
-unsigned long previousMillis = 0; // Stores last time readings were updated
-const long tempInterval = 30000; // Interval for displaying temperature readings
+unsigned long previousTempMillis = 0; // Stores last time temp readings were updated
+unsigned long previousAvgMillis = 0; // Stores last time avg readings were updated
+const long tempInterval = 30000; // Interval for displaying temperature readings (30 seconds)
 const long tempSelection = 10000; // Interval for displaying temperature
-int currentMenu = 0; // Hard-coded to select "Temperatures" as default
+const long avgInterval = 900000; // Interval for displaying the average screen (30 seconds)
+int currentMenu = 0; 
 static bool isStarted=true;
 bool isMenuActive = true;
 bool menuDrawn = false;               // Flag to check if the menu has already been drawn
@@ -20,28 +22,28 @@ void setup() {
   delay(1000);
 
 // initialize Sensors & Displays
-  initDisplays();
-  initTempSensors(); 
-//   initAltitude(); 
-//initLogging();
+    initAltitude(); 
+    initDisplays();
+    initTempSensors(); 
+    //initLogging();
     initBuzzer();
     turnBuzzerOn(true);
- 
+ Serial.print("init done");
     delay(1000);
 }
 
 void loop() {
    unsigned long currentMillis = millis(); // Get the current time
-
-    if(currentMillis - previousMillis >= tempSelection) {
-        currentMenu=2;
+    if(currentMillis - previousTempMillis >= tempSelection) {
+        currentMenu=3;
     }
-
+   
     switch (currentMenu)
     {
         case 0:
             if (!menuDrawn) {
-                   drawMenu();         // Call drawMenu only once when currentMenu is 0
+                   drawMenu();  
+                   drawAvgScreen();       // Call drawMenu only once when currentMenu is 0
                    menuDrawn = true;   // Set flag to prevent repeated calls
                }
         break;
@@ -54,10 +56,11 @@ void loop() {
             drawTemperaturesScreen(temp);
             isStarted=false;
             }
-            else if(currentMillis - previousMillis >= tempInterval) {
-                previousMillis = currentMillis;
-                Temperatures temp = getTemperatures(); // Read temperature data
-                drawTemperaturesScreen(temp);// Update OLED with new readings
+            else if(currentMillis - previousTempMillis >= tempInterval) {
+                previousTempMillis = currentMillis;
+                Temperatures temp = getTemperatures(); 
+                drawTemperaturesScreen(temp);
+                drawAvgScreen();
             }
         break;
         case 3:
@@ -67,8 +70,8 @@ void loop() {
                 drawAltitudeScreen(altitude,temp);
                 isStarted=false;
             }
-            else if(currentMillis - previousMillis >= tempInterval) {
-                previousMillis = currentMillis;
+            else if(currentMillis - previousTempMillis >= tempInterval) {
+                previousTempMillis = currentMillis;
                  Altitude altitude = getAltitude(); 
                 Temperatures temp = getTemperatures();
                 drawAltitudeScreen(altitude,temp);
@@ -83,10 +86,16 @@ void loop() {
 
     default:
         if(!menuDrawn) {
-                    drawMenu();         // Call drawMenu only once when currentMenu is 0
-                    menuDrawn = true;   // Set flag to prevent repeated calls
+                    drawMenu();         
+                    menuDrawn = true;
                 }
     break;
     }
    
+    if (currentMillis - previousAvgMillis >= avgInterval) {
+        previousAvgMillis = currentMillis; 
+        // getAvg();yet to be implemented
+        drawAvgScreen();
+    }
+
 }

@@ -11,5 +11,6 @@ void drawMenu();
 // Function to display temperatures on the OLED
 void drawTemperaturesScreen(Temperatures temp);
 void drawAltitudeScreen(Altitude altitude,Temperatures temp);
+void drawAvgScreen();
 
 #endif // DISPLAY_H
