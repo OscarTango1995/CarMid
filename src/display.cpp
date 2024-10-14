@@ -139,24 +139,24 @@ void initDisplays() {
     oled.setI2CAddress(0x3C << 1);  
     if (!oled.begin()) {
     Serial.println(F("Failed to initialize display"));
-    while (1);  /
+    while (1);  
     }
     delay(750);
-
 
     oled2.setI2CAddress(0x3D << 1);  
     if (!oled2.begin()) {
     Serial.println(F("Failed to initialize display"));
     while (1);  
-    delay(750);
   }
+      delay(750);
+
 }
 
 // Function to display temperature data on the OLED
-void drawTemperaturesScreen(Temperatures temp) {
+void drawTemperaturesScreen(Temperatures temp, int coolantTemp) {
     char content[60]; 
     snprintf(content, sizeof(content), "OAT : %d C\nIAT : %d C\nRH  : %d %% \nENG : %d C", 
-             (int)temp.oat, (int)temp.iat, (int)temp.humidity,(int)temp.engine);
+             (int)temp.oat, (int)temp.iat, (int)temp.humidity,coolantTemp);
     
     drawDisplay(oled2, "TEMPERATURES", content);    
 }

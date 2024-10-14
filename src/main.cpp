@@ -4,6 +4,7 @@
 #include"logger.h"
 #include"altitude.h"
 #include"buzzer.h"
+#include"elm.h"
 
 unsigned long previousTempMillis = 0; // Stores last time temp readings were updated
 unsigned long previousAvgMillis = 0; // Stores last time avg readings were updated
@@ -18,24 +19,24 @@ bool menuDrawn = false;               // Flag to check if the menu has already b
 
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(9600);
-  delay(1000);
+    Serial.begin(9600);
+    delay(1000);
 
 // initialize Sensors & Displays
+    initializeBluetooth(); // Initialize Bluetooth
     initAltitude(); 
     initDisplays();
     initTempSensors(); 
-    //initLogging();
+    // initLogging();
     initBuzzer();
     turnBuzzerOn(true);
- Serial.print("init done");
-    delay(1000);
+    Serial.print("init done");
 }
 
 void loop() {
    unsigned long currentMillis = millis(); // Get the current time
     if(currentMillis - previousTempMillis >= tempSelection) {
-        currentMenu=3;
+        currentMenu=2;
     }
    
     switch (currentMenu)
@@ -52,15 +53,23 @@ void loop() {
         break;
         case 2:
         if (isStarted){
-            Temperatures temp = getTemperatures(); 
-            drawTemperaturesScreen(temp);
+            // float coolantTemp=readCoolantTemp();
+            float coolantTemp=10.0; 
+
+            delay(750);
+            Temperatures temp = getTemperatures();
+            drawTemperaturesScreen(temp,coolantTemp);
             isStarted=false;
             }
             else if(currentMillis - previousTempMillis >= tempInterval) {
                 previousTempMillis = currentMillis;
                 Temperatures temp = getTemperatures(); 
-                drawTemperaturesScreen(temp);
-                drawAvgScreen();
+                // float coolantTemp=readCoolantTemp(); 
+                float coolantTemp=10.0; 
+
+                delay(750);
+                Temperatures temp = getTemperatures(); // Read temperature data
+                drawTemperaturesScreen(temp,coolantTemp);// Update OLED with new readings
             }
         break;
         case 3:

@@ -9,7 +9,7 @@ void initDisplays();
 void drawMenu();
 
 // Function to display temperatures on the OLED
-void drawTemperaturesScreen(Temperatures temp);
+void drawTemperaturesScreen(Temperatures temp,int coolantTemp);
 void drawAltitudeScreen(Altitude altitude,Temperatures temp);
 void drawAvgScreen();
 
