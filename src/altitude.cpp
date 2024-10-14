@@ -3,17 +3,15 @@
 #include <Adafruit_BMP280.h>
 #include"altitude.h"
 
-// Create a BMP280 object
 Adafruit_BMP280 bmp;
 
-// Define sea-level pressure (in hPa) for your location (approximate)
-#define SEALEVELPRESSURE_HPA (1015.0)
+#define SEALEVELPRESSURE_HPA (1013.0)
 
 float temperatureCalibration=0.0;
 
 // Function to initialize the Temperaure sensors
 void initAltitude() {
-  if (!bmp.begin(0x76)) {  // Change to 0x77 if needed
+  if (!bmp.begin(0x76)) { 
     Serial.println(F("Could not find a valid BMP280 sensor, check wiring!"));
     while (1);
   }
@@ -28,8 +26,8 @@ void initAltitude() {
 }
 
 Altitude getAltitude(){
-    bmp.takeForcedMeasurement(); // Force the sensor to take a measurement
-
+    bmp.takeForcedMeasurement(); 
+    
     float temperature = bmp.readTemperature();
     float pressure = bmp.readPressure() / 100.0F;  // Convert Pa to hPa
     float altitude = bmp.readAltitude(SEALEVELPRESSURE_HPA);

@@ -6,9 +6,8 @@
 
 
 // U8G2 constructor for the OLED (replace 0x3C with the correct address if needed)
-U8G2_SH1106_128X64_NONAME_F_SW_I2C oled(U8G2_R0, SCL, SDA, U8X8_PIN_NONE);
+U8G2_SSD1306_128X32_UNIVISION_F_HW_I2C oled(U8G2_R0, SCL, SDA, U8X8_PIN_NONE);
 U8G2_SH1106_128X64_NONAME_F_SW_I2C oled2(U8G2_R0, SCL, SDA, U8X8_PIN_NONE);
-
 
 void drawDisplay(U8G2_SH1106_128X64_NONAME_F_SW_I2C &oled, const char* title, const char* content) {
     oled.clearDisplay();
@@ -52,10 +51,41 @@ void drawDisplay(U8G2_SH1106_128X64_NONAME_F_SW_I2C &oled, const char* title, co
     oled.sendBuffer();
 }
 
+void drawDisplayOLED(U8G2_SSD1306_128X32_UNIVISION_F_HW_I2C &oled, const char* content) {
+    oled.clearDisplay();
+    oled.clearBuffer();
+    
+    // Draw the outer frame around the entire display
+    oled.setDrawColor(1);  // Set draw color to white
+    oled.drawFrame(0, 0, 128, 32);  // Draw a border around the display
+    
+    oled.setFont(u8g2_font_9x15_tr); // Set font for content
+    oled.setDrawColor(1);  // Set draw color to white for text
+
+    // Start drawing the content
+    int contentYPosition = 15;  // Start position for content
+    const int leftPadding = 6; // Left padding for text
+    const int lineHeight = 13; // Line height for spacing
+
+    // Tokenize content by newline
+    char* token = strtok((char*)content, "\n");
+
+    while (token != NULL) {
+        oled.setCursor(leftPadding, contentYPosition);  // Set cursor for each line
+        oled.print(token);  // Print each line
+        contentYPosition += lineHeight;  // Move down for the next line
+        token = strtok(NULL, "\n");  // Get the next line
+    }
+
+    oled.sendBuffer();
+}
+
+
 // Function to draw a menu with submenus
 void drawMenu() {
     oled2.clearDisplay();
     oled2.clearBuffer();
+
      // Define menu items
     const char* menuItems[] = {
         "1. GPS",
@@ -80,8 +110,10 @@ void drawMenu() {
     oled2.setDrawColor(1);  // Set draw color to white for text
 
     // Center the title
-    oled2.setCursor((128 - oled.getStrWidth("Main Menu")) / 2, 10);
+    oled2.setCursor((128 - oled2.getStrWidth("Main Menu")) / 2, 10);
+
     oled2.print("Main Menu");
+
 
    // Draw the menu items
     oled2.setFont(u8g2_font_7x14_tr); // font
@@ -104,45 +136,45 @@ void initDisplays() {
     Wire.begin();
     delay(100); 
 
-
-    oled.setI2CAddress(0x3C << 1);  // Left-shifted I2C address for 7-bit format
+    oled.setI2CAddress(0x3C << 1);  
     if (!oled.begin()) {
     Serial.println(F("Failed to initialize display"));
-    while (1);  // Stay here if the display fails to initialize
+    while (1);  /
     }
-    drawDisplay(oled, "Average", "16 KM/L");
-    oled.sendBuffer();  // Push the data to the OLED screen
-    delay(1000);
+    delay(750);
 
 
-    oled2.setI2CAddress(0x3D << 1);  // Left-shifted I2C address for 7-bit format
+    oled2.setI2CAddress(0x3D << 1);  
     if (!oled2.begin()) {
     Serial.println(F("Failed to initialize display"));
-    while (1);  // Stay here if the display fails to initialize
-    delay(1000);
+    while (1);  
+    delay(750);
   }
 }
 
 // Function to display temperature data on the OLED
 void drawTemperaturesScreen(Temperatures temp) {
-    // Create content string for display without floating points
-    char content[60]; // Ensure the buffer is large enough for your content
+    char content[60]; 
     snprintf(content, sizeof(content), "OAT : %d C\nIAT : %d C\nRH  : %d %% \nENG : %d C", 
              (int)temp.oat, (int)temp.iat, (int)temp.humidity,(int)temp.engine);
     
-    // Call drawDisplay to show the temperatures
-    drawDisplay(oled2, "TEMPERATURES", content);
-        
+    drawDisplay(oled2, "TEMPERATURES", content);    
 }
 
 // Function to display altitude data on the OLED
 void drawAltitudeScreen(Altitude altitude,Temperatures temp) {
-    // Create content string for display without floating points
-    char content[60]; // Ensure the buffer is large enough for your content
-    snprintf(content, sizeof(content), "ALT : %d M \nHPA : %d\nIAT : %d C \nOAT : %d C", 
+    char content[60]; 
+    snprintf(content, sizeof(content), "ALT : %d M \nHPA : %d hPa\nIAT : %d C \nOAT : %d C", 
              (int)altitude.altitude, (int)altitude.pressure, (int)altitude.temperature,(int)temp.oat);
     
-    // Call drawDisplay to show the temperatures
     drawDisplay(oled2, "ALTITUDE", content);
-        
+}
+
+// Function to display avg data on the OLED
+void drawAvgScreen() {
+    char content[60]; 
+    snprintf(content, sizeof(content), "AVG : %d KM/L \nDTE : %dKM", 
+             20, 500);
+    
+    drawDisplayOLED(oled, content); 
 }
