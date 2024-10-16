@@ -7,23 +7,14 @@
 const int RECV_PIN = 16; 
 
 // Hex values for remote buttons
-#define BUTTON_UP 0xFE01EF00
-#define BUTTON_DOWN 0xF609EF00
-#define BUTTON_BACK 0xFB04EF00
-#define BUTTON_SELECT 0xFA05EF00
-#define BUTTON_RESET 0xFC03EF00
-
-
-#define ZERO 0xF50AEF00
-#define ONE 0xF40BEF00
-// #define TWO 0xFB04EF00
-// #define THREE 0xFA05EF00
-// #define FOUR 0xFE01EF00
-// #define FIVE 0xF609EF00
-// #define SIX 0xFB04EF00
-// #define SEVEN 0xFA05EF00
-// #define EIGHT 0xFE01EF00
-// #define NINE 0xF609EF00
+#define BUTTON_UP 0xBF4052AD
+#define BUTTON_DOWN 0xBE4152AD
+#define BUTTON_BACK 0xBD4252AD
+#define BUTTON_SELECT 0xE61952AD
+// #define BUTTON_SERVICE 0xE51A52AD
+#define BUTTON_RESET 0xA75852AD
+// #define BUTTON_INCR 0xF50A52AD
+// #define BUTTON_DECR 0xF40B52AD
 
 
 // Variables for menu control
@@ -61,11 +52,12 @@ void handleMenuNavigation(unsigned long irCode) {
             // Handle the selected item action
             handleMenuAction(selectedItem);
             break;
-        case BUTTON_BACK: // Back button
+         case BUTTON_BACK: // Back button
             currentMenu = 0; // Set to main menu
             selectedItem = 0; // Reset selected item to the first item
             drawMenu(selectedItem); // Redraw the main menu
-            break;    
+            break;     
+                  
     }
 }
 
@@ -96,14 +88,13 @@ void handleMenuAction(int selectedItem) {
             currentMenu = 5;
             Serial.println("Service selected");
             break;
-        // Handle other cases if necessary
     }
 }
 
 void decodeIR(){
      if (IrReceiver.decode()) {
         unsigned long irCode = IrReceiver.decodedIRData.decodedRawData;
-        handleMenuNavigation(irCode); // Call to handle menu selection
+        handleMenuNavigation(irCode); // Handle regular menu navigation        
         IrReceiver.resume(); // Enable receiving of the next value
     }
 }

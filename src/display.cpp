@@ -4,7 +4,6 @@
 #include"temperature.h"
 #include"altitude.h"
 
-
 // U8G2 constructor for the OLED (replace 0x3C with the correct address if needed)
 U8G2_SSD1306_128X32_UNIVISION_F_HW_I2C oled(U8G2_R0, SCL, SDA, U8X8_PIN_NONE);
 U8G2_SH1106_128X64_NONAME_F_SW_I2C oled2(U8G2_R0, SCL, SDA, U8X8_PIN_NONE);
@@ -312,11 +311,12 @@ void drawAvgScreen(bool primary,bool update) {
 }
 
 void drawServiceScreen() {
-    char eoilStr[16], goilStr[16], eoilcStr[16],goilcStr[16];
-    sprintf(eoilStr, "%d", 178000);
-    sprintf(goilStr, "%d", 178000);
-    sprintf(eoilcStr, "%d",183000);
-    sprintf(goilcStr, "%d",231000);  
+    int eoilValue = 178000;
+    int goilValue = 173580;
+
+    int eoilcValue = eoilValue + 5000; // Add 5000 to the original value
+    int goilcValue = goilValue + 40000; // Add 30000 to the original value
+ 
 
     drawInitialDisplay(oled2,"SERVICE");
     oled2.setFont(u8g2_font_7x14_tr);
@@ -329,10 +329,10 @@ void drawServiceScreen() {
     oled2.setCursor(6, contentYPosition +3* lineHeight); oled2.print("G-CHG: ");
 
 
-    oled2.setCursor(50, contentYPosition + 0 * lineHeight); oled2.print(eoilStr);
-    oled2.setCursor(50, contentYPosition + 1 * lineHeight); oled2.print(goilStr);
-    oled2.setCursor(50, contentYPosition + 2 * lineHeight); oled2.print(eoilcStr);
-    oled2.setCursor(50, contentYPosition + 3 * lineHeight); oled2.print(goilcStr);
+    oled2.setCursor(50, contentYPosition + 0 * lineHeight); oled2.print(eoilValue);
+    oled2.setCursor(50, contentYPosition + 1 * lineHeight); oled2.print(goilValue);
+    oled2.setCursor(50, contentYPosition + 2 * lineHeight); oled2.print(eoilcValue);
+    oled2.setCursor(50, contentYPosition + 3 * lineHeight); oled2.print(goilcValue);
 
     oled2.sendBuffer();
 }
