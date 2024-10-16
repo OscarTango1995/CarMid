@@ -6,11 +6,14 @@
 // Function declarations for initializing and updating displays
 void initDisplays();
 // Function to display the main menu
-void drawMenu();
+void drawMenu(int selectedItem);
 
 // Function to display temperatures on the OLED
-void drawTemperaturesScreen(Temperatures temp);
-void drawAltitudeScreen(Altitude altitude,Temperatures temp);
-void drawAvgScreen();
+void drawTemperaturesScreen(Temperatures temp, bool update);
+void drawAltitudeScreen(Altitude altitude,Temperatures temp,bool update);
+void updateTemperaturesScreen(Temperatures temp);
+void drawAvgScreen(bool primary,bool update);
+void drawGPSScreen(bool update);
+void drawServiceScreen();
 
 #endif // DISPLAY_H
