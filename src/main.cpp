@@ -4,7 +4,10 @@
 #include"logger.h"
 #include"altitude.h"
 #include"buzzer.h"
+#include"remote.h"
 
+bool selected=false;
+unsigned long lastInteractionMillis = 0; // Timer for user interaction
 unsigned long previousTempMillis = 0; // Stores last time temp readings were updated
 unsigned long previousAvgMillis = 0; // Stores last time avg readings were updated
 const long tempInterval = 30000; // Interval for displaying temperature readings (30 seconds)
@@ -14,7 +17,6 @@ int currentMenu = 0;
 static bool isStarted=true;
 bool isMenuActive = true;
 bool menuDrawn = false;               // Flag to check if the menu has already been drawn
-
 
 void setup() {
   // put your setup code here, to run once:
@@ -26,67 +28,88 @@ void setup() {
     initDisplays();
     initTempSensors(); 
     //initLogging();
+    initIRSensor();
     initBuzzer();
     turnBuzzerOn(true);
- Serial.print("init done");
+    Serial.print("init done");
     delay(1000);
 }
 
 void loop() {
+   decodeIR();
    unsigned long currentMillis = millis(); // Get the current time
-    if(currentMillis - previousTempMillis >= tempSelection) {
-        currentMenu=3;
+
+    if (!selected && currentMillis - tempSelection<=0 ){
+        currentMenu=2;
+        selected=true;
     }
    
     switch (currentMenu)
     {
         case 0:
+            isStarted=true;
             if (!menuDrawn) {
-                   drawMenu();  
-                   drawAvgScreen();       // Call drawMenu only once when currentMenu is 0
+                   drawMenu(0);  
+                   drawAvgScreen(false,false);       // Call drawMenu only once when currentMenu is 0
                    menuDrawn = true;   // Set flag to prevent repeated calls
                }
         break;
         case 1:
-        /* code */
-        break;
-        case 2:
-        if (isStarted){
-            Temperatures temp = getTemperatures(); 
-            drawTemperaturesScreen(temp);
+        if (isStarted){ 
+            drawGPSScreen(false);
             isStarted=false;
             }
             else if(currentMillis - previousTempMillis >= tempInterval) {
                 previousTempMillis = currentMillis;
-                Temperatures temp = getTemperatures(); 
-                drawTemperaturesScreen(temp);
-                drawAvgScreen();
+            drawGPSScreen(true);
+            }
+        break;
+        case 2:
+        if (isStarted){
+            Temperatures temp = getTemperatures(); 
+            drawTemperaturesScreen(temp,false);
+            isStarted=false;
+            }
+            else if(currentMillis - previousTempMillis >= tempInterval) {
+                previousTempMillis = currentMillis;
+                Temperatures temp = getTemperatures();
+                temp.engine=65; 
+                drawTemperaturesScreen(temp,true);
             }
         break;
         case 3:
         if (isStarted){
                 Altitude altitude = getAltitude(); 
                 Temperatures temp = getTemperatures();
-                drawAltitudeScreen(altitude,temp);
+                drawAltitudeScreen(altitude,temp,false);
                 isStarted=false;
             }
             else if(currentMillis - previousTempMillis >= tempInterval) {
                 previousTempMillis = currentMillis;
-                 Altitude altitude = getAltitude(); 
+                Altitude altitude = getAltitude();
                 Temperatures temp = getTemperatures();
-                drawAltitudeScreen(altitude,temp);
+                drawAltitudeScreen(altitude,temp,true);
             }
         break;
         case 4:
-        /* code */
+        if (isStarted){
+                drawAvgScreen(true,false);
+                isStarted=false;
+            }
+            else if(currentMillis - previousAvgMillis >= avgInterval) {
+                drawAvgScreen(true,true);
+            }
         break;
         case 5:
-        /* code */
+        if (isStarted){
+                drawServiceScreen();
+                isStarted=false;
+            }
         break;
 
     default:
         if(!menuDrawn) {
-                    drawMenu();         
+                    drawMenu(0);         
                     menuDrawn = true;
                 }
     break;
@@ -95,7 +118,7 @@ void loop() {
     if (currentMillis - previousAvgMillis >= avgInterval) {
         previousAvgMillis = currentMillis; 
         // getAvg();yet to be implemented
-        drawAvgScreen();
+        drawAvgScreen(false,false);
     }
 
 }
