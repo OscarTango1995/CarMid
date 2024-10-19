@@ -19,10 +19,10 @@ unsigned long previousAvgMillis = 0;     // Stores last time avg readings were u
 const long tempInterval = 30000;         // Interval for displaying temperature readings (30 seconds)
 const long tempSelection = 5000;         // Interval for displaying temperature
 const long avgInterval = 30000;          // Interval for displaying the average screen (30 seconds)
-int currentMenu = 0;
+uint8_t currentMenu = 0;
 static bool isStarted = true;
 bool isMenuActive = true;
-bool menuDrawn = false; // Flag to check if the menu has already been drawn
+bool menuDrawn = false; 
 
 void setup()
 {
@@ -47,8 +47,9 @@ void loop()
 {
     decodeIR();
 
-    unsigned long currentMillis = millis(); // Get the current time
+    unsigned long currentMillis = millis(); 
     unsigned long currentAvgMillis = millis();
+
     if (!selected && currentMillis >= tempSelection)
     {
         currentMenu = 2;
@@ -62,8 +63,8 @@ void loop()
         {
             drawMenu(0);
             delay(100);
-            drawAvgScreen(false, 16.25, 17, 30, 500); // Call drawMenu only once when currentMenu is 0
-            menuDrawn = true;                         // Set flag to prevent repeated calls
+            drawAvgScreen(false, 16.25, 17, 30, 500); 
+            menuDrawn = true;                        
         }
         break;
     case 1:
@@ -91,6 +92,7 @@ void loop()
         {
             float coolantTemp = readCoolantTemp();
             // float coolantTemp = 10.0;
+            // fuelrate();
             delay(200);
             Temperatures temp = getTemperatures();
             getInfo();
@@ -104,6 +106,8 @@ void loop()
             Temperatures temp = getTemperatures();
             float coolantTemp = readCoolantTemp();
             delay(200);
+            // fuelrate();
+
             // float coolantTemp = 10.0;
 
             if (averageUpdated)
@@ -116,6 +120,8 @@ void loop()
                 previousTempMillis = currentMillis;
                 Temperatures temp = getTemperatures();
                 getInfo();
+                // fuelrate();
+
 
                 drawTemperaturesScreen(temp, true, coolantTemp);
             }
@@ -134,7 +140,7 @@ void loop()
             Temperatures temp = getTemperatures();
             if (averageUpdated)
             {
-                Altitude altitude = getAltitude(); // Get the second reading
+                Altitude altitude = getAltitude(); 
                 delay(150);
                 Serial.println("updating al");
                 drawAltitudeScreen(altitude, temp, false);

@@ -9,7 +9,7 @@ extern ELM327 myELM327;
 
 void initializeBluetooth();
 void connectToOBD();
-int readCoolantTemp();
+uint8_t readCoolantTemp();
 float readFuelFlow();
 float calculateAverageFuelConsumption(float fuelFlow);
 

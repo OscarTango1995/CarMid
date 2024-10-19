@@ -4,6 +4,7 @@
 BluetoothSerial SerialBT;
 ELM327 myELM327;
 
+
 void initializeBluetooth()
 {
     if (!SerialBT.begin("ArduHUD", true))
@@ -24,7 +25,7 @@ void connectToOBD()
         while (1)
             ;
     }
-    if (!myELM327.begin(SerialBT, true, 2000))
+    if (!myELM327.begin(SerialBT, false, 2000))
     {
         Serial.println("Couldn't connect to OBD scanner - Phase 2");
         while (1)
@@ -33,14 +34,12 @@ void connectToOBD()
     Serial.println("Connected to ELM327");
 }
 
-int readCoolantTemp()
+uint8_t readCoolantTemp()
 {
     float coolant = myELM327.engineCoolantTemp();
     if (myELM327.nb_rx_state == ELM_SUCCESS)
     {
-        Serial.print("coolant: ");
-        Serial.println((uint32_t)coolant);
-        return (uint32_t)coolant;
+        return (uint8_t)coolant;
     }
     else if (myELM327.nb_rx_state != ELM_GETTING_MSG)
     {
@@ -75,9 +74,8 @@ float readFuelFlow()
         myELM327.printError();
     }
 
-    float K = 0.5; // Adjust this based on your engine's specifications
 
-    float fuelFlow = (engineLoad / 100.0) * (manifoldPressure / 100.0) * (throttlePosition / 100.0) * (rpm / 2.0) * K;
+    float fuelFlow = (engineLoad / 100.0) * (manifoldPressure / 100.0) * (throttlePosition / 100.0) * (rpm / 2.0) * 0.5; //K is 0.5
 
     return fuelFlow; // Return fuel flow in L/h
 }
@@ -85,7 +83,7 @@ float readFuelFlow()
 float calculateAverageFuelConsumption(float fuelFlow)
 {
     // Step 1:Calculate speed
-    int32_t speed = myELM327.kph();
+    uint8_t speed = myELM327.kph();
     if (myELM327.nb_rx_state != ELM_GETTING_MSG)
     {
         myELM327.printError();
@@ -102,7 +100,5 @@ float calculateAverageFuelConsumption(float fuelFlow)
         fuelConsumptionRate = 1;
     }
 
-    float averageFuelConsumption = distanceTraveled / fuelConsumptionRate;
-
-    return averageFuelConsumption; // Return average fuel consumption in km/L
+    return distanceTraveled / fuelConsumptionRate; // Return average fuel consumption in km/L
 }

@@ -18,8 +18,8 @@
 extern int currentMenu;
 extern bool menuDrawn;
 extern bool isStarted;
-int selectedItem = 0;  // Initially, the first menu item is selected
-int menuItemCount = 5; // Total number of menu items
+u_int8_t selectedItem = 0;  // Initially, the first menu item is selected
+u_int8_t menuItemCount = 5; // Total number of menu items
 
 // Create an IR receiver object
 decode_results results;

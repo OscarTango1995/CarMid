@@ -1,14 +1,11 @@
 #include <TinyGPS++.h>
 #include <HardwareSerial.h>
 
-// Create GPS object
 TinyGPSPlus gps;
 
-// Use HardwareSerial to communicate with the GPS module
-HardwareSerial gpsSerial(1);  // UART1
-// If you are using other pins, specify them here:
-int RXPin = 17;   // Connect this to TX of GPS
-int TXPin = 5;   // Connect this to RX of GPS (if needed)
+HardwareSerial gpsSerial(1);  
+uint8_t RXPin = 17;   // Connect this to TX of GPS
+uint8_t TXPin = 5;   // Connect this to RX of GPS (if needed)
 
 void initGPS() {
   gpsSerial.begin(9600, SERIAL_8N1, RXPin, TXPin);  // Start GPS communication

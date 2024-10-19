@@ -9,10 +9,6 @@ DHT dht(15, DHT21); // GPIO pin,Sensor Type
 OneWire oneWire(4); // OneWire bus on GPIO pin 4
 DallasTemperature sensors(&oneWire);
 
-float insideTemperatureCalibration = 0.0;
-float insideHumidityCalibration = -16.0;
-float outsideTemperatureCalibration = 1.0;
-
 // Function to initialize the Temperaure sensors
 void initTempSensors()
 {
@@ -24,11 +20,6 @@ float readOutsideTemperature()
 {
     sensors.requestTemperatures();
     return sensors.getTempCByIndex(0);
-}
-
-float readEngineTemperature()
-{
-    return readCoolantTemp();
 }
 
 InsideTempHumidity readInsideTemperature()
@@ -48,8 +39,8 @@ Temperatures getTemperatures()
     delay(750);
 
     Temperatures temp;
-    temp.humidity = insideTemp.humidity + insideHumidityCalibration;
-    temp.iat = insideTemp.temperature + insideTemperatureCalibration;
-    temp.oat = outsideTemp + outsideTemperatureCalibration;
+    temp.humidity = insideTemp.humidity - 16.0; // For calibration
+    temp.iat = insideTemp.temperature + 0.0;    // For calibration
+    temp.oat = outsideTemp + 1.0;               // For calibration
     return temp;
 }
