@@ -12,8 +12,9 @@ void drawMenu(int selectedItem);
 void drawTemperaturesScreen(Temperatures temp, bool update, int coolantTemp);
 void drawAltitudeScreen(Altitude altitude, Temperatures temp, bool update);
 void updateTemperaturesScreen(Temperatures temp);
-void drawAvgScreen(bool update, float avg, float dis, int fuel, int dte);
-void drawGPSScreen(bool update);
+void drawAvgScreen(float avg, float dis, float fuel, float dte);
+void drawGPSScreen(bool update,int sats, int speed,int fix);
+void drawEngineScreen(int rpm, int coolantTemp,int speed,float fuel, bool update);
 void drawServiceScreen();
 
 #endif // DISPLAY_H

@@ -1,3 +1,35 @@
+#include<Arduino.h>
+// Define the push button pin
+const int buttonPin = 27;
+
+void setup() {
+  // Start Serial Monitor
+  Serial.begin(9600);
+  delay(1000);
+
+  // Set the button pin as an input with an internal pull-up resistor
+  pinMode(buttonPin, INPUT_PULLUP);
+}
+
+void loop() {
+  // Read the state of the button
+  int buttonState = digitalRead(buttonPin);
+
+  // Check if the button is pressed (LOW means pressed, HIGH means released due to pull-up)
+  if (buttonState == LOW) {
+    Serial.println("Button Pressed");
+  } else {
+    Serial.println("Button Released");
+  }
+
+  // Delay to avoid rapid output in the Serial Monitor
+  delay(200);
+}
+
+
+
+
+
 #include <Arduino.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -39,7 +71,6 @@ bool actionTriggered = false; // Flag to track if toggle has been triggered
 bool carUnlocked = true;
 bool lastButtonState = HIGH; // Assume the button starts unpressed (HIGH)
 bool currentButtonState = HIGH;
-int lockStatus = 0;
 
 void setup()
 {
@@ -47,53 +78,50 @@ void setup()
     delay(500);
     // initialize Sensors & Displays
     initSDCard(true);
-    initializeBluetooth();
-    initAltitude();
-    initDisplays();
-    initTempSensors();
-    initIRSensor();
-    initFuelLevelSensor();
-    initGPS();
-    initBuzzer();
-    turnBuzzerOn(true);
+    // initializeBluetooth();
+    // initAltitude();
+    // initDisplays();
+    // initTempSensors();
+    // initIRSensor();
+    // initFuelLevelSensor();
+    // initGPS();
+    // initBuzzer();
+    // turnBuzzerOn(true);
     initRelays();
     pinMode(hallSensorPin, INPUT);
     pinMode(toggleButtonPin, INPUT_PULLUP);
     pinMode(lockStatusButtonPin, INPUT_PULLUP);
+
     Serial.println("Initialization Completed.....");
     delay(150);
 }
 
 void checkCentralLocking()
 {
-    int currentButtonState = digitalRead(lockStatusButtonPin);
+//    // Check the lock status button to determine if the car is locked or unlocked
+//     if (digitalRead(lockStatusButtonPin) == HIGH) {
+//         carUnlocked = true; // Car is unlocked
+//     } else {
+//         carUnlocked = false; // Car is locked
+//     }
 
-    if (currentButtonState != lastButtonState)
+//     // If the car is unlocked, pressing the button will lock the car
+//     if (carUnlocked && digitalRead(lockStatusButtonPin) == LOW) {
+//         Serial.print("in here");
+//         lockCar();
+//             carUnlocked = false; // Update status after locking
+
+//     }
+
+    if (carUnlocked)
     {
-        if (currentButtonState == LOW)
-        {
-            Serial.println("Car Is Unlocked");
-            carUnlocked = true;
-            lockStatus = 0;
-        }
-        else
-        {
-            Serial.println("Car Is Locked");
-            carUnlocked = false;
-            lockStatus = 1;
-        }
-
-        lastButtonState = currentButtonState;
-    }
-
-    if (carUnlocked && lockStatus == 0)
-    {
+        Serial.print("now herer");
         lockCar();
     }
 
     if ((digitalRead(hallSensorPin) == LOW || digitalRead(toggleButtonPin) == LOW) && !actionTriggered) // Assuming LOW means detected
     {
-        unLockCar();
+        toggleCarLock();
         actionTriggered = true;
     }
     else if (digitalRead(hallSensorPin) == HIGH && digitalRead(toggleButtonPin) == HIGH)
@@ -104,13 +132,13 @@ void checkCentralLocking()
 
 void loop()
 {
-    decodeIR();
+    // decodeIR();
     unsigned long currentMillis = millis(); // Get the current time
     unsigned long currentAvgMillis = millis();
 
     checkCentralLocking();
 
-    switch (currentMenu)
+    /*switch (currentMenu)
     {
     case 0:
         isStarted = true;
@@ -215,15 +243,16 @@ void loop()
         {
             EngineInfo engine = getEngineInfo();
             float fuel = getFuelAvailable();
+            float vin = readVoltage();
             if (averageUpdated)
             {
 
-                drawEngineScreen(engine.rpm, engine.coolantTemp, engine.speed, fuel, false);
+                drawEngineScreen(engine.rpm, engine.coolantTemp, vin, fuel, false);
                 averageUpdated = false;
             }
             else
             {
-                drawEngineScreen(engine.rpm, engine.coolantTemp, engine.speed, fuel, true);
+                drawEngineScreen(engine.rpm, engine.coolantTemp, vin, fuel, true);
                 previousTempMillis = currentMillis;
             }
         }
@@ -295,5 +324,5 @@ void loop()
         {
             turnBuzzerOn(false);
         }
-    }
+    }*/
 }

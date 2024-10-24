@@ -38,7 +38,7 @@ void drawMenu(int selectedItem)
         "1. GPS",
         "2. Temps",
         "3. Altitude",
-        "4. Average",
+        "4. Engine",
         "5. Service"};
 
     int itemCount = sizeof(menuItems) / sizeof(menuItems[0]);
@@ -191,13 +191,13 @@ void drawTemperaturesScreen(Temperatures temp, bool update, int coolantTemp)
 }
 
 // Function to display GPS data on the OLED
-void drawGPSScreen(bool update)
+void drawGPSScreen(bool update, int sats, int speed, int fix)
 {
     oled2.setI2CAddress(0x3D << 1);
-    char satStr[10], spdStr[10], dteStr[10];
-    sprintf(satStr, "%d ", 4);
-    sprintf(spdStr, "%d KM/H", 100);
-    sprintf(dteStr, "%d KM", 500);
+    char satStr[10], spdStr[10], fixStr[10];
+    sprintf(satStr, "%d ", sats);
+    sprintf(spdStr, "%d KM/H", speed);
+    sprintf(fixStr, "%dD", fix);
 
     if (!update)
     {
@@ -211,15 +211,14 @@ void drawGPSScreen(bool update)
         oled2.setCursor(6, contentYPosition + 1 * lineHeight);
         oled2.print("SPD : ");
         oled2.setCursor(6, contentYPosition + 2 * lineHeight);
-        oled2.print("DTE : ");
+        oled2.print("FIX : ");
 
         oled2.setCursor(50, contentYPosition + 0 * lineHeight);
         oled2.print(satStr);
         oled2.setCursor(50, contentYPosition + 1 * lineHeight);
         oled2.print(spdStr);
         oled2.setCursor(50, contentYPosition + 2 * lineHeight);
-        oled2.print(dteStr);
-        oled2.sendBuffer();
+        oled2.print(fixStr);
     }
     else
     {
@@ -232,8 +231,9 @@ void drawGPSScreen(bool update)
         oled2.setCursor(50, 37);
         oled2.print(spdStr);
         oled2.setCursor(50, 49);
-        oled2.print(dteStr);
+        oled2.print(fixStr);
     }
+
     oled2.sendBuffer();
 }
 
@@ -291,8 +291,9 @@ void drawAltitudeScreen(Altitude altitude, Temperatures temp, bool update)
 }
 
 // Function to display avg data on the OLED
-void drawAvgScreen(bool update, float avg, float dis, int fuel, int dte)
+void drawAvgScreen(float avg, float dis, float fuel, float dte)
 {
+    Serial.println();
     oled.setI2CAddress(0x3C << 1);
     oled.clearDisplay();
     // Draw the outer frame
@@ -323,11 +324,11 @@ void drawAvgScreen(bool update, float avg, float dis, int fuel, int dte)
     oled.setCursor(7, contentYPosition + 3 * lineHeight);
     oled.print("DTE : ");
 
-    char avgStr[10], disStr[16], fuelStr[10], dteStr[10];
-    sprintf(avgStr, "%0.1f KPL", avg);
-    sprintf(disStr, "%0.2f KM", dis);
-    sprintf(fuelStr, "%d %%", fuel);
-    sprintf(dteStr, "%d KM", dte);
+    char avgStr[10], disStr[20], fuelStr[10], dteStr[10];
+    snprintf(avgStr, sizeof(avgStr), "%0.2f KPL", avg);
+    snprintf(disStr, sizeof(disStr), "%0.2f KM", dis);
+    snprintf(fuelStr, sizeof(fuelStr), "%0.2f L", fuel);
+    snprintf(dteStr, sizeof(dteStr), "%0.2f KM", dte);
 
     oled.setCursor(51, contentYPosition + 0 * lineHeight);
     oled.print(avgStr);
@@ -373,5 +374,59 @@ void drawServiceScreen()
     oled2.setCursor(50, contentYPosition + 3 * lineHeight);
     oled2.print(goilcValue);
 
+    oled2.sendBuffer();
+}
+
+// Function to display altitude data on the OLED
+void drawEngineScreen(int rpm, int coolantTemp, int speed, float fuel, bool update)
+{  
+    
+    oled2.setI2CAddress(0x3D << 1);
+    char rpmStr[10], engStr[10], speedStr[16], fuelStr[10];
+    sprintf(rpmStr, "%d ", rpm);
+    sprintf(engStr, "%d C", coolantTemp);
+    sprintf(speedStr,"%d KM/H ", speed);
+    sprintf(fuelStr, "%0.2f L", fuel);
+
+    if (!update)
+    {
+        drawInitialDisplay(oled2, "ENGINE");
+        oled2.setFont(u8g2_font_7x14_tr);
+        int contentYPosition = 25;
+        int lineHeight = 12;
+
+        oled2.setCursor(6, contentYPosition + 0 * lineHeight);
+        oled2.print("RPM : ");
+        oled2.setCursor(6, contentYPosition + 1 * lineHeight);
+        oled2.print("SPD: ");
+        oled2.setCursor(6, contentYPosition + 2 * lineHeight);
+        oled2.print("ENG : ");
+        oled2.setCursor(6, contentYPosition + 3 * lineHeight);
+        oled2.print("FUEL : ");
+
+        oled2.setCursor(50, contentYPosition + 0 * lineHeight);
+        oled2.print(rpmStr);
+        oled2.setCursor(50, contentYPosition + 1 * lineHeight);
+        oled2.print(speedStr);
+        oled2.setCursor(50, contentYPosition + 2 * lineHeight);
+        oled2.print(engStr);
+        oled2.setCursor(50, contentYPosition + 3 * lineHeight);
+        oled2.print(fuelStr);
+    }
+    else
+    {
+        oled2.setDrawColor(0);
+        oled2.drawBox(45, 15, 70, 47);
+
+        oled2.setDrawColor(1);
+        oled2.setCursor(50, 25);
+        oled2.print(rpmStr);
+        oled2.setCursor(50, 37);
+        oled2.print(speedStr);
+        oled2.setCursor(50, 49);
+        oled2.print(engStr);
+        oled2.setCursor(50, 61);
+        oled2.print(fuelStr);
+    }
     oled2.sendBuffer();
 }
